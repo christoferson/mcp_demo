@@ -57,24 +57,17 @@ def main():
 
             print(f"   Available tools ({len(tools)}):")
             for tool in tools:
-                # MCPAgentTool has different attributes - let's inspect it
-                # Try to get the tool definition
-                if hasattr(tool, 'definition'):
-                    tool_def = tool.definition
-                    tool_name = tool_def.get('name', 'unknown')
-                    tool_desc = tool_def.get('description', 'no description')
-                    print(f"   - {tool_name}: {tool_desc}")
-                elif hasattr(tool, '__dict__'):
-                    # Print the tool's attributes for debugging
-                    print(f"   - Tool attributes: {tool.__dict__}")
-                else:
-                    print(f"   - Tool: {tool}")
+                # Access the mcp_tool attribute which contains the Tool object
+                mcp_tool = tool.mcp_tool
+                # Get first line of description
+                desc_first_line = mcp_tool.description.split('\n')[0].strip()
+                print(f"   - {mcp_tool.name}: {desc_first_line}")
 
             # Create an agent with the MCP tools
             print("\n3. Creating Strands agent with AWS tools...")
             agent = Agent(
                 tools=tools,
-                #model="anthropic:claude-3-5-sonnet-20241022"
+                #model="anthropic.claude-3-5-sonnet-20241022-v2:0"  # Bedrock model
             )
             print("   ✓ Agent created successfully")
 
@@ -82,21 +75,17 @@ def main():
             print("\n4. Testing: List S3 buckets via agent...")
             try:
                 response = agent("Can you list all my S3 buckets?")
-                print(f"   Agent response:\n   {response}")
+                print(f"   Agent response:\n   {response}\n")
             except Exception as e:
                 print(f"   Error: {e}")
-                import traceback
-                traceback.print_exc()
 
             # Test 2: List DynamoDB tables
             print("\n5. Testing: List DynamoDB tables via agent...")
             try:
                 response = agent("Can you list all my DynamoDB tables?")
-                print(f"   Agent response:\n   {response}")
+                print(f"   Agent response:\n   {response}\n")
             except Exception as e:
                 print(f"   Error: {e}")
-                import traceback
-                traceback.print_exc()
 
             # Test 3: Get S3 object (optional - update with your bucket/key)
             print("\n6. Testing: Get S3 object via agent (optional)...")
@@ -106,7 +95,7 @@ def main():
                 #     "Can you get the contents of the file 'your-file-key' "
                 #     "from the bucket 'your-bucket-name'?"
                 # )
-                # print(f"   Agent response:\n   {response}")
+                # print(f"   Agent response:\n   {response}\n")
                 print("   Skipped (update bucket/key in code to test)")
             except Exception as e:
                 print(f"   Error: {e}")
@@ -119,7 +108,7 @@ def main():
                 #     "Can you query the DynamoDB table 'your-table-name' "
                 #     "for items where id equals '123'?"
                 # )
-                # print(f"   Agent response:\n   {response}")
+                # print(f"   Agent response:\n   {response}\n")
                 print("   Skipped (update table/key in code to test)")
             except Exception as e:
                 print(f"   Error: {e}")
@@ -131,11 +120,9 @@ def main():
                     "List my S3 buckets and tell me how many I have. "
                     "Also, what AWS services can you help me with?"
                 )
-                print(f"   Agent response:\n   {response}")
+                print(f"   Agent response:\n   {response}\n")
             except Exception as e:
                 print(f"   Error: {e}")
-                import traceback
-                traceback.print_exc()
 
             print("\n" + "=" * 60)
             print("✓ Demo completed successfully!")
